@@ -46,7 +46,8 @@ def create_test_run(test_type, payload):
     url = f"{BASE_URL}/v2/TestRuns"
     response = requests.post(url, json=body)
     if response.status_code != 201:
-        raise Exception("FAILED TO CREATE TESTRUN")
+        # raise Exception("FAILED TO CREATE TESTRUN")
+        return {}
     return response.json()
 
 
@@ -74,22 +75,27 @@ def validate_service(service_type, url, output_folder, validator_url=""):
         BASE_URL = validator_url
     payload = {"serviceEndpoint": url}
     data = create_test_run(service_type, payload)
-    test_run_id = data["EtfItemCollection"]["testRuns"]["TestRun"]["id"]
-    while True:
-        if test_run_completed(test_run_id):
-            break
-        time.sleep(POLLING_WAIT_TIME)
-    # retrieve json
-    result_json = json.loads(get_resource(f"/v2/TestRuns/{test_run_id}.json"))
-    # retrieve html
-    result_html = get_resource(f"/v2/TestRuns/{test_run_id}.html").\
-        decode("utf-8")
-    status = result_json["EtfItemCollection"]["testRuns"]["TestRun"]["status"]
-    valid = bool(status == "PASSED")
-    html_path = os.path.join(output_folder, f"{test_run_id}.html")
 
-    with open(html_path, "w") as html_file:
-        html_file.write(result_html)
+    if data:
+        test_run_id = data["EtfItemCollection"]["testRuns"]["TestRun"]["id"]
+        while True:
+            if test_run_completed(test_run_id):
+                break
+            time.sleep(POLLING_WAIT_TIME)
+        # retrieve json
+        result_json = json.loads(get_resource(f"/v2/TestRuns/{test_run_id}.json"))
+        # retrieve html
+        result_html = get_resource(f"/v2/TestRuns/{test_run_id}.html").\
+            decode("utf-8")
+        status = result_json["EtfItemCollection"]["testRuns"]["TestRun"]["status"]
+        valid = bool(status == "PASSED")
+        html_path = os.path.join(output_folder, f"{test_run_id}.html")
+        with open(html_path, "w") as html_file:
+            html_file.write(result_html)
+    else:
+        valid = False
+        html_path = ""
+
     result = {}
     result["valid"] = valid
     result["html_path"] = html_path
