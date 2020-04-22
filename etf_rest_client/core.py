@@ -6,6 +6,8 @@ from datetime import datetime
 import requests
 
 BASE_URL = "http://inspire.ec.europa.eu/validator"
+
+
 POLLING_WAIT_TIME = 2
 TESTS = {"ATOM": {
             "id": "EID11571c92-3940-4f42-a6cd-5e2b1c6f4d93",
@@ -40,9 +42,7 @@ def create_test_run(test_type, payload):
         }
     }
     body["testObject"]["resources"] = payload
-    print(json.dumps(body, indent=4))
     url = f"{BASE_URL}/v2/TestRuns"
-    print(url)
     response = requests.post(url, json=body)
     if response.status_code != 201:
         raise Exception("FAILED TO CREATE TESTRUN")
@@ -67,7 +67,10 @@ def get_resource(path):
     return data
 
 
-def validate_atom(url, output_folder):
+def validate_atom(url, output_folder, validator_url=""):
+    if validator_url:
+        global BASE_URL
+        BASE_URL = validator_url
     payload = {"serviceEndpoint": url}
     data = create_test_run("ATOM", payload)
     test_run_id = data["EtfItemCollection"]["testRuns"]["TestRun"]["id"]
