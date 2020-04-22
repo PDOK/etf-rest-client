@@ -1,4 +1,5 @@
 import json
+import os
 import time
 import uuid
 from datetime import datetime
@@ -85,7 +86,8 @@ def validate_atom(url, output_folder, validator_url=""):
         decode("utf-8")
     status = result_json["EtfItemCollection"]["testRuns"]["TestRun"]["status"]
     valid = bool(status == "PASSED")
-    html_path = f"{output_folder}/{test_run_id}.html"
+    html_path = os.path.join(output_folder, f"{test_run_id}.html")
+
     with open(html_path, "w") as html_file:
         html_file.write(result_html)
     result = {}
