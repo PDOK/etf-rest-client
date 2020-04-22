@@ -68,12 +68,12 @@ def get_resource(path):
     return data
 
 
-def validate_atom(url, output_folder, validator_url=""):
+def validate_service(service_type, url, output_folder, validator_url=""):
     if validator_url:
         global BASE_URL
         BASE_URL = validator_url
     payload = {"serviceEndpoint": url}
-    data = create_test_run("ATOM", payload)
+    data = create_test_run(service_type, payload)
     test_run_id = data["EtfItemCollection"]["testRuns"]["TestRun"]["id"]
     while True:
         if test_run_completed(test_run_id):
@@ -93,6 +93,6 @@ def validate_atom(url, output_folder, validator_url=""):
     result = {}
     result["valid"] = valid
     result["html_path"] = html_path
-    result["etf_test_id"] = TESTS["ATOM"]["id"]
-    result["etf_test_label"] = TESTS["ATOM"]["title"]
+    result["etf_test_id"] = TESTS[service_type]["id"]
+    result["etf_test_label"] = TESTS[service_type]["title"]
     return result

@@ -1,6 +1,6 @@
 import json
 import click
-from .core import validate_atom
+from .core import validate_service
 
 
 @click.group()
@@ -13,7 +13,7 @@ def cli():
 @click.argument('result-path', type=click.Path(exists=True))
 @click.option('--validator-url')
 def validate_atom_commmand(service_url, result_path, validator_url):
-    result = validate_atom(service_url, result_path, validator_url)
+    result = validate_service("ATOM", service_url, result_path, validator_url)
     print(json.dumps(result, indent=4))
 
 
