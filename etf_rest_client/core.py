@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 
 import requests
+from requests.exceptions import ChunkedEncodingError
 
 BASE_URL = "http://inspire.ec.europa.eu/validator"
 
@@ -60,7 +61,7 @@ def test_run_completed(testrun_id):
     return bool(data["max"] == data["val"])
 
 
-def get_resource(path):
+def get_resource(path, retry=0):
     url = f"{BASE_URL}/{path}"
     response = requests.get(url)
     if response.status_code != 200:
@@ -83,9 +84,10 @@ def validate_service(service_type, url, output_folder, validator_url=""):
                 break
             time.sleep(POLLING_WAIT_TIME)
         # retrieve json
-        result_json = json.loads(get_resource(f"/v2/TestRuns/{test_run_id}.json"))
+        result_json = json.loads(get_resource(
+            f"v2/TestRuns/{test_run_id}.json"))
         # retrieve html
-        result_html = get_resource(f"/v2/TestRuns/{test_run_id}.html").\
+        result_html = get_resource(f"v2/TestRuns/{test_run_id}.html").\
             decode("utf-8")
         status = result_json["EtfItemCollection"]["testRuns"]["TestRun"]["status"]
         valid = bool(status == "PASSED")

@@ -15,7 +15,8 @@ def cli():
 @click.option('--validator-url')
 def validate_service_command(
         service_type, service_url, result_path, validator_url):
-    result = validate_service(service_type, service_url, result_path, validator_url)
+    result = validate_service(service_type, service_url,
+                              result_path, validator_url)
     print(json.dumps(result, indent=4))
 
 
